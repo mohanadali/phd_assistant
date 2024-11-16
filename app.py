@@ -31,4 +31,4 @@ if query:
         st.markdown(f"[Read PDF]({result['link']})")
 
 # Footer
-st.write("Powered by Open-Source Tools.")
+st.write("Powered by PhD. students 2024-2025")
