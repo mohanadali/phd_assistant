@@ -5,39 +5,35 @@ import nltk
 
 nltk.download('punkt', quiet=True)
 
-def search_google(query, max_results=1):
-    """
-    Perform a Google search and return the first link.
-    """
-    from googlesearch import search
 
+def custom_search(query):
+    """
+    Perform a custom search using publicly available websites like Wikipedia.
+    """
+    search_url = f"https://en.wikipedia.org/wiki/{query.replace(' ', '_')}"
     try:
-        results = []
-        for url in search(query, num_results=max_results):
-            results.append(url)
-        return results[0] if results else None
+        response = requests.get(search_url)
+        if response.status_code == 200:
+            return response.text
+        else:
+            return None
     except Exception as e:
-        print(f"Error during Google Search: {e}")
+        print(f"Error fetching search results: {e}")
         return None
 
 
-def fetch_and_summarize_content(url):
+def extract_and_summarize_content(html_content):
     """
-    Fetch the content from the given URL and summarize it.
+    Extract and summarize the content from the fetched HTML.
     """
     try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
-
-        # Extract the main content (this may need to be adjusted per website)
+        soup = BeautifulSoup(html_content, 'html.parser')
         paragraphs = soup.find_all('p')
-        content = " ".join([para.text for para in paragraphs])
-
-        # Summarize the content
+        content = " ".join([para.text for para in paragraphs if para.text.strip()])
         summary = summarize_text(content)
         return summary
     except Exception as e:
-        print(f"Error fetching or summarizing content: {e}")
+        print(f"Error extracting content: {e}")
         return "Failed to retrieve content."
 
 
@@ -53,9 +49,9 @@ def search_and_summarize(query):
     """
     Perform a search, fetch the first result, and summarize its content.
     """
-    url = search_google(query)
-    if url:
-        summary = fetch_and_summarize_content(url)
-        return {"url": url, "summary": summary}
+    html_content = custom_search(query)
+    if html_content:
+        summary = extract_and_summarize_content(html_content)
+        return {"url": f"https://en.wikipedia.org/wiki/{query.replace(' ', '_')}", "summary": summary}
     else:
-        return {"url": None, "summary": "No results found."}
+        return {"url": None, "summary": "No results found or content could not be retrieved."}
