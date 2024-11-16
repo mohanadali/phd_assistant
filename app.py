@@ -1,4 +1,5 @@
 import streamlit as st
+import nltk
 from document_processing import extract_text, summarize_text
 from web_search import search_web
 
