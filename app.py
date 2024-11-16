@@ -1,11 +1,13 @@
 import streamlit as st
 import nltk
 from document_processing import extract_text, summarize_text
-from web_search import search_web
+from web_search import search_and_summarize
+
 nltk.download('punkt', quiet=True)
+
 st.title("PhD Assistant AI")
 
-# Document Upload Section
+# Section 1: Document Upload and Analysis
 st.header("1. Document Upload and Analysis")
 uploaded_file = st.file_uploader("Upload a PDF or Word document", type=["pdf", "docx"])
 if uploaded_file:
@@ -14,21 +16,23 @@ if uploaded_file:
         f.write(uploaded_file.getbuffer())
     extracted_text = extract_text(file_path)
     st.subheader("Extracted Text:")
-    st.write(extracted_text[:1000])  # Show a snippet
+    st.write(extracted_text[:1000])  # Show a snippet of the extracted text
     summary = summarize_text(extracted_text)
     st.subheader("Summary:")
     st.write(summary)
 
-# Web Search Section
+# Section 2: Autonomous Web Search and Summarization
 st.header("2. Autonomous Web Search")
 query = st.text_input("Enter your search query:")
 if query:
-    results = search_web(query)
-    st.subheader("Search Results:")
-    for idx, result in enumerate(results):
-        st.write(f"### {idx + 1}. {result['title']}")
-        st.write(result['summary'])
-        st.markdown(f"[Read PDF]({result['link']})")
+    st.write("Searching the web...")
+    result = search_and_summarize(query)
+    if result["url"]:
+        st.subheader("Search Result Summary:")
+        st.write(result["summary"])
+        st.markdown(f"[Read Full Article]({result['url']})")
+    else:
+        st.warning("No results found. Try another query.")
 
 # Footer
 st.write("Powered by PhD. students 2024-2025")
