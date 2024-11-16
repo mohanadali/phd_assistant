@@ -4,7 +4,8 @@ from document_processing import extract_text, summarize_text
 import nltk
 
 # Ensure the NLTK Punkt tokenizer is available
-nltk.download('punkt', quiet=True)
+nltk.download('punkt')
+nltk.download('punkt_tab')
 
 # App Title
 st.title("PhD Assistant AI")
