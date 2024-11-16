@@ -2,6 +2,7 @@ import PyPDF2
 from docx import Document
 import nltk
 from nltk.tokenize import sent_tokenize
+from nltk.probability import FreqDist
 
 nltk.download('punkt')
 
@@ -15,16 +16,33 @@ def extract_text(file_path):
 
 def extract_text_from_pdf(file_path):
     text = ""
-    with open(file_path, 'rb') as file:
-        reader = PyPDF2.PdfReader(file)
-        for page in reader.pages:
-            text += page.extract_text()
+    try:
+        with open(file_path, 'rb') as file:
+            reader = PyPDF2.PdfReader(file)
+            for page in reader.pages:
+                text += page.extract_text() or ""
+    except Exception as e:
+        text = f"Error extracting text from PDF: {e}"
     return text
 
 def extract_text_from_docx(file_path):
-    doc = Document(file_path)
-    return "\n".join([para.text for para in doc.paragraphs])
+    try:
+        doc = Document(file_path)
+        return "\n".join([para.text for para in doc.paragraphs])
+    except Exception as e:
+        return f"Error extracting text from DOCX: {e}"
 
 def summarize_text(text, num_sentences=5):
-    sentences = sent_tokenize(text)
-    return " ".join(sentences[:num_sentences])
+    try:
+        sentences = sent_tokenize(text)
+        return " ".join(sentences[:num_sentences])
+    except Exception as e:
+        return f"Error summarizing text: {e}"
+
+def extract_keywords(text, num_keywords=5):
+    try:
+        words = [word.lower() for word in nltk.word_tokenize(text) if word.isalnum()]
+        freq_dist = FreqDist(words)
+        return [word for word, _ in freq_dist.most_common(num_keywords)]
+    except Exception as e:
+        return f"Error extracting keywords: {e}"
