@@ -5,50 +5,57 @@ import nltk
 
 nltk.download('punkt', quiet=True)
 
-def custom_search(query):
+def fetch_wikipedia(query):
     """
-    Perform a custom search on Wikipedia by constructing the URL.
+    Fetch content from Wikipedia for the given query.
     """
     search_url = f"https://en.wikipedia.org/wiki/{query.replace(' ', '_')}"
     try:
         response = requests.get(search_url, timeout=10)
         if response.status_code == 200:
-            return response.text
-        elif response.status_code == 404:
-            return None  # Page not found
-        else:
-            raise Exception(f"Unexpected HTTP status code: {response.status_code}")
+            return {"source": "Wikipedia", "html": response.text, "url": search_url}
+        return None
     except Exception as e:
-        print(f"Error fetching search results: {e}")
+        print(f"Error fetching Wikipedia: {e}")
         return None
 
 
-def extract_and_summarize_content(html_content):
+def fetch_dictionary(query):
     """
-    Extract and summarize the content from the fetched HTML.
+    Fetch content from Dictionary.com or similar websites.
+    """
+    search_url = f"https://www.dictionary.com/browse/{query.replace(' ', '-')}"
+    try:
+        response = requests.get(search_url, timeout=10)
+        if response.status_code == 200:
+            return {"source": "Dictionary.com", "html": response.text, "url": search_url}
+        return None
+    except Exception as e:
+        print(f"Error fetching Dictionary.com: {e}")
+        return None
+
+
+def extract_content(source, html_content):
+    """
+    Extract meaningful content from the HTML based on the source.
     """
     try:
         soup = BeautifulSoup(html_content, 'html.parser')
 
-        # Extract main content paragraphs
-        paragraphs = soup.find_all('p')
-        if not paragraphs:
-            return "No content available to summarize."
+        if source == "Wikipedia":
+            paragraphs = soup.find_all('p')
+            content = " ".join([para.get_text() for para in paragraphs if para.get_text().strip()])
+            return remove_citations(content)
 
-        # Combine text from all paragraphs
-        content = " ".join([para.get_text() for para in paragraphs if para.get_text().strip()])
+        if source == "Dictionary.com":
+            definition = soup.find('span', class_="one-click-content")
+            if definition:
+                return definition.get_text()
+            return "No definition found."
 
-        # Debugging: Print first few lines of content
-        print("Extracted Content Sample:", content[:500])
-
-        # Remove citations (e.g., [1], [2])
-        content = remove_citations(content)
-
-        # Summarize the content
-        summary = summarize_text(content)
-        return summary
+        return "No content available."
     except Exception as e:
-        print(f"Error extracting content: {e}")
+        print(f"Error extracting content from {source}: {e}")
         return "Failed to retrieve content."
 
 
@@ -60,7 +67,7 @@ def remove_citations(text):
     return re.sub(r'\[\d+\]', '', text)
 
 
-def summarize_text(text, num_sentences=5):
+def summarize_text(text, num_sentences=3):
     """
     Summarize the given text by extracting the first `num_sentences`.
     """
@@ -74,10 +81,17 @@ def search_and_summarize(query):
     """
     Perform a search, fetch the content, and summarize it.
     """
-    html_content = custom_search(query)
-    if html_content:
-        summary = extract_and_summarize_content(html_content)
-        url = f"https://en.wikipedia.org/wiki/{query.replace(' ', '_')}"
-        return {"url": url, "summary": summary}
-    else:
-        return {"url": None, "summary": "No results found or content could not be retrieved."}
+    # Try Wikipedia first
+    result = fetch_wikipedia(query)
+    if result:
+        content = extract_content("Wikipedia", result["html"])
+        summary = summarize_text(content)
+        return {"url": result["url"], "summary": summary}
+
+    # Fallback to Dictionary.com
+    result = fetch_dictionary(query)
+    if result:
+        content = extract_content("Dictionary.com", result["html"])
+        return {"url": result["url"], "summary": content}
+
+    return {"url": None, "summary": "No results found or content could not be retrieved."}
