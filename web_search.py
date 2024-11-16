@@ -16,7 +16,7 @@ def search_google_snippet(query):
         response = requests.get(search_url, headers=headers, timeout=10)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "html.parser")
-            snippets = soup.find_all("span", class_="aCOpRe")
+            snippets = soup.select("div.BNeawe.s3v9rd.AP7Wnd")  # Updated selector for Google snippets
             if snippets:
                 return snippets[0].get_text()  # Return the first snippet
         return "No relevant information found."
