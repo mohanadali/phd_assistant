@@ -11,7 +11,7 @@ def custom_search(query):
     """
     search_url = f"https://en.wikipedia.org/wiki/{query.replace(' ', '_')}"
     try:
-        response = requests.get(search_url)
+        response = requests.get(search_url, timeout=10)
         if response.status_code == 200:
             return response.text
         elif response.status_code == 404:
@@ -29,16 +29,18 @@ def extract_and_summarize_content(html_content):
     """
     try:
         soup = BeautifulSoup(html_content, 'html.parser')
-        
-        # Extract the main content paragraphs
+
+        # Extract main content paragraphs
         paragraphs = soup.find_all('p')
-        
         if not paragraphs:
             return "No content available to summarize."
 
         # Combine text from all paragraphs
         content = " ".join([para.get_text() for para in paragraphs if para.get_text().strip()])
-        
+
+        # Debugging: Print first few lines of content
+        print("Extracted Content Sample:", content[:500])
+
         # Remove citations (e.g., [1], [2])
         content = remove_citations(content)
 
