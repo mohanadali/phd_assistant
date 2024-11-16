@@ -1,4 +1,4 @@
-app.py
+
 import streamlit as st
 from web_search import search_and_summarize
 from document_processing import extract_text, summarize_text
