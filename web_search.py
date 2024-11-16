@@ -3,8 +3,9 @@ from bs4 import BeautifulSoup
 from nltk.tokenize import sent_tokenize
 import nltk
 
-# Ensure the NLTK tokenizer is available
+# Ensure the NLTK Punkt tokenizer is downloaded
 nltk.download('punkt', quiet=True)
+
 
 def search_google_snippet(query):
     """
@@ -24,6 +25,7 @@ def search_google_snippet(query):
         print(f"Error fetching Google results: {e}")
         return "Failed to retrieve content."
 
+
 def search_dictionary(query):
     """
     Fetch a definition from Dictionary.com or a similar dictionary site.
@@ -41,6 +43,7 @@ def search_dictionary(query):
         print(f"Error fetching dictionary results: {e}")
         return "Failed to retrieve content."
 
+
 def summarize_text(text, num_sentences=3):
     """
     Summarize the given text by extracting the first `num_sentences`.
@@ -50,6 +53,7 @@ def summarize_text(text, num_sentences=3):
         return "No content available to summarize."
     return " ".join(sentences[:num_sentences])
 
+
 def search_and_summarize(query):
     """
     Perform a search, retrieve content from multiple sources, and summarize it.
@@ -58,11 +62,12 @@ def search_and_summarize(query):
     snippet = search_google_snippet(query)
     if snippet and snippet != "No relevant information found.":
         summary = summarize_text(snippet)
-        return {"source": "Google Search", "summary": summary}
+        return {"source": "Google Search", "summary": summary, "url": f"https://www.google.com/search?q={query.replace(' ', '+')}"}
 
     # Fallback to Dictionary.com for definitions
     definition = search_dictionary(query)
     if definition and definition != "No definition found.":
-        return {"source": "Dictionary.com", "summary": definition}
+        return {"source": "Dictionary.com", "summary": definition, "url": f"https://www.dictionary.com/browse/{query.replace(' ', '-')}"}    
 
-    return {"source": "None", "summary": "No results found or content could not be retrieved."}
+    # No results found
+    return {"source": "None", "summary": "No results found or content could not be retrieved.", "url": None}
