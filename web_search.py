@@ -6,7 +6,6 @@ import nltk
 # Ensure the NLTK Punkt tokenizer is downloaded
 nltk.download('punkt', quiet=True)
 
-
 def search_google_snippet(query):
     """
     Perform a basic Google search and extract snippets from the results.
@@ -22,9 +21,7 @@ def search_google_snippet(query):
                 return snippets[0].get_text()  # Return the first snippet
         return "No relevant information found."
     except Exception as e:
-        print(f"Error fetching Google results: {e}")
-        return "Failed to retrieve content."
-
+        return f"Error fetching Google results: {e}"
 
 def search_dictionary(query):
     """
@@ -40,9 +37,7 @@ def search_dictionary(query):
                 return definition.get_text()
         return "No definition found."
     except Exception as e:
-        print(f"Error fetching dictionary results: {e}")
-        return "Failed to retrieve content."
-
+        return f"Error fetching dictionary results: {e}"
 
 def summarize_text(text, num_sentences=3):
     """
@@ -52,7 +47,6 @@ def summarize_text(text, num_sentences=3):
     if not sentences:
         return "No content available to summarize."
     return " ".join(sentences[:num_sentences])
-
 
 def search_and_summarize(query):
     """
