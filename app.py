@@ -22,7 +22,7 @@ if uploaded_file:
         # Extract text from the document
         extracted_text = extract_text(file_path)
         st.subheader("Extracted Text:")
-        st.write(extracted_text[:1000])  # Show a snippet of the extracted text
+        st.write(extracted_text[:5000])  # Show a snippet of the extracted text
         # Summarize the extracted text
         summary = summarize_text(extracted_text)
         st.subheader("Summary:")
