@@ -1,9 +1,9 @@
 import streamlit as st
-import nltk
-from document_processing import extract_text, summarize_text
 from web_search import search_and_summarize
+from document_processing import extract_text, summarize_text
+import nltk
 
-# Ensure NLTK data is downloaded
+# Ensure the NLTK Punkt tokenizer is available
 nltk.download('punkt', quiet=True)
 
 # App Title
@@ -26,17 +26,17 @@ if uploaded_file:
     st.subheader("Summary:")
     st.write(summary)
 
-# Section 2: Autonomous Web Search and Summarization
+# Section 2: Autonomous Web Search
 st.header("2. Autonomous Web Search")
 query = st.text_input("Enter your search query:")
 if query:
-    st.write("Searching Wikipedia...")
-    # Perform search and summarization
+    st.write("Searching the web...")
     result = search_and_summarize(query)
-    if result["url"]:
-        st.subheader("Search Result Summary:")
+    if result["source"] != "None":
+        st.subheader(f"Search Result from {result['source']}:")
         st.write(result["summary"])
-        st.markdown(f"[Read Full Article]({result['url']})")
+        if result["url"]:
+            st.markdown(f"[Read Full Article]({result['url']})")
     else:
         st.warning("No results found. Try another query.")
 
