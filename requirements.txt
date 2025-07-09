@@ -1,6 +1,12 @@
 streamlit
-PyPDF2
-python-docx
-nltk
-beautifulsoup4
 requests
+pandas
+numpy
+plotly
+folium
+streamlit-folium
+pytz
+datetime
+geopy
+scipy
+scikit-learn
