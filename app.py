@@ -1,4 +1,4 @@
-import streamlit as st
+THIS SHOULD BE A LINTER ERRORimport streamlit as st
 from web_search import search_and_summarize
 from document_processing import extract_text, summarize_text
 import nltk
